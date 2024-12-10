@@ -303,15 +303,21 @@ int usb_midi_read(uint32_t channel)
 				(*usb_midi_handleNoteOff)(ch, (n >> 16), (n >> 24));
 		} else
 		if (type1 == 0x09 && type2 == 0x09) {
-			if ((n >> 24) > 0) {
-				usb_midi_msg_type = 0x90;	// 0x90 = usbMIDI.NoteOn
-				if (usb_midi_handleNoteOn)
-					(*usb_midi_handleNoteOn)(ch, (n >> 16), (n >> 24));
-			} else {
-				usb_midi_msg_type = 0x80;	// 0x80 = usbMIDI.NoteOff
-				if (usb_midi_handleNoteOff)
-					(*usb_midi_handleNoteOff)(ch, (n >> 16), (n >> 24));
+			// MRCC BUG FIX: "NoteOn vel=0" gets translated to "NoteOff vel=0", it should not! ***
+			usb_midi_msg_type = 0x90;	// 0x90 = usbMIDI.NoteOn
+			if (usb_midi_handleNoteOn) {
+				(*usb_midi_handleNoteOn)(ch, (n >> 16), (n >> 24));
 			}
+			// Original Code... MRCC BUG FIX: "NoteOn vel=0" gets translated to "NoteOff vel=0", it should not! ***
+			// if ((n >> 24) > 0) {
+			// 	usb_midi_msg_type = 0x90;	// 0x90 = usbMIDI.NoteOn
+			// 	if (usb_midi_handleNoteOn)
+			// 		(*usb_midi_handleNoteOn)(ch, (n >> 16), (n >> 24));
+			// } else {
+			// 	usb_midi_msg_type = 0x80;	// 0x80 = usbMIDI.NoteOff
+			// 	if (usb_midi_handleNoteOff)
+			// 		(*usb_midi_handleNoteOff)(ch, (n >> 16), (n >> 24));
+			// }
 		} else
 		if (type1 == 0x0A && type2 == 0x0A) {
 			usb_midi_msg_type = 0xA0;		// 0xA0 = usbMIDI.AfterTouchPoly

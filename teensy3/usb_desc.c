@@ -2039,3 +2039,11 @@ const uint8_t usb_endpoint_config_table[NUM_ENDPOINTS] =
 
 #endif // NUM_ENDPOINTS
 #endif // F_CPU >= 20 MHz
+
+// *****************************************************************************************************************
+// **    added by Conductive Labs to enable Windows app to uniquely identify multiple same HW devices plugged in
+// *****************************************************************************************************************
+void modifyProductIdToFoolMIDIApps(uint16_t deviceId) {
+  device_descriptor[10] = (uint8_t)(deviceId & 0xff);
+  device_descriptor[11] = (uint8_t)((deviceId >> 8) & 0xff);
+}

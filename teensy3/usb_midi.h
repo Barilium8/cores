@@ -41,7 +41,7 @@
 #if defined(__MKL26Z64__) || defined(__MK20DX128__)
 #define USB_MIDI_SYSEX_MAX  60
 #else
-#define USB_MIDI_SYSEX_MAX 290
+#define USB_MIDI_SYSEX_MAX 512
 #endif
 
 // C language implementation
