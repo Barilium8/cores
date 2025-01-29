@@ -1061,7 +1061,7 @@ typedef struct {
 	uint16_t	length;
 } usb_descriptor_list_t;
 
-extern const usb_descriptor_list_t usb_descriptor_list[];
+extern usb_descriptor_list_t usb_descriptor_list[];
 #endif // NUM_ENDPOINTS
 #endif // USB_DESC_LIST_DEFINE
 
