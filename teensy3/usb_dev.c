@@ -185,13 +185,13 @@ void updateProductNameDescriptor(usb_descriptor_list_t *list) {
 	const uint32_t EEPROM_SETTINGS_SPACE = 40; // reserve 40 bytes
 	const uint32_t SETTINGS_EEPROM_ADDYS = (EEPROM_SIZE - 1 - EEPROM_SETTINGS_SPACE - EEPROM_SYSTEM_INFO_SPACE);
 
-	const uint8_t* SETTINGS_DEVICE_NAME_LETTER_ADDY = (SETTINGS_EEPROM_ADDYS + 15); // 1 byte
+	const uint8_t* SETTINGS_DEVICE_NAME_LETTER_ADDY = (const uint8_t*)(SETTINGS_EEPROM_ADDYS + 15); // 1 byte
 
 	uint8_t deviceNameLetter = eeprom_read_byte(SETTINGS_DEVICE_NAME_LETTER_ADDY);
 	if ((deviceNameLetter >= 'A') && (deviceNameLetter <= 'Z')) {
-		wchar_t* name_letter_address = mrcc_name_letter_address_1;
+		wchar_t* name_letter_address = (wchar_t*)mrcc_name_letter_address_1;
 		*name_letter_address = '-';
-		name_letter_address = mrcc_name_letter_address_2;
+		name_letter_address = (wchar_t*)mrcc_name_letter_address_2;
 		*name_letter_address = deviceNameLetter;
 	}
 }

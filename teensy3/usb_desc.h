@@ -610,8 +610,8 @@ let me know?  http://forum.pjrc.com/forums/4-Suggestions-amp-Bug-Reports
   #define ENDPOINT5_CONFIG	ENDPOINT_RECEIVE_ONLY
 
 #elif defined(USB_MIDI16_SERIAL)
-  
-  // ***************************************************************************************
+ 
+  /* ***************************************************************************************
   //   NOTE:  files usb_desc.h  &  usb_desc.c
   //          is NOT compiled form the Git dir  C:\Github\MRCC\lib\cores\teensy3\
   //          it IS  compiled from the PIO dir  C:\Users\steve\.platformio\packages\framework-arduinoteensy\cores\teensy3\
@@ -619,14 +619,14 @@ let me know?  http://forum.pjrc.com/forums/4-Suggestions-amp-Bug-Reports
   //          SO THIS FILE MUST BE MANUALLY COPIED FROM the GIT dir to the PIO dir
   //
   //          THIS IS *** BAD *** and should be changed to compile from C:\Github\MRCC\lib\cores\teensy3\
-  // ***************************************************************************************
+  // **************************************************************************************/
 
   #define VENDOR_ID	  	0x16C0 // via "VOTI" PJRC USB Vendor 
   #define PRODUCT_ID	0x047E // test  MRCC 0x0490(1150), PJRC PID=1140-1239 dec  FYI NDLR is 0x0489(1167) 	
   #define BCD_DEVICE	0x0212
-  // ***************************************************************************************
+  /* ***************************************************************************************
   //   NOTE:  FYI These strings are modified in file  USBNAMES.C  in C:\Github\MRCC\src\
-  // ***************************************************************************************
+  // **************************************************************************************/
   #define MANUFACTURER_NAME	{'C','o','n','d','u','c','t','i','v','e',' ','L','a','b','s'}
   #define MANUFACTURER_NAME_LEN	15
   #define PRODUCT_NAME		{'M','R','C','C','_','?','?','?'}
