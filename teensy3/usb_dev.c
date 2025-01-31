@@ -179,19 +179,11 @@ static uint8_t reply_buffer[8];
 #ifdef MRCC_USB_MIDI12_SERIAL
 static int productNameIsUpdated = 0;
 
-void updateProductNameDescriptor(usb_descriptor_list_t *list) {
-	const uint32_t EEPROM_SIZE = 4096;         // Assume device EEPROM size is 4k, adjust if this changes in later rev
-	const uint32_t EEPROM_SYSTEM_INFO_SPACE = 20; // reserve 20 bytes
-	const uint32_t EEPROM_SETTINGS_SPACE = 40; // reserve 40 bytes
-	const uint32_t SETTINGS_EEPROM_ADDYS = (EEPROM_SIZE - 1 - EEPROM_SETTINGS_SPACE - EEPROM_SYSTEM_INFO_SPACE);
-
-	const uint8_t* SETTINGS_DEVICE_NAME_LETTER_ADDY = (const uint8_t*)(SETTINGS_EEPROM_ADDYS + 15); // 1 byte
-
-	uint8_t deviceNameLetter = eeprom_read_byte(SETTINGS_DEVICE_NAME_LETTER_ADDY);
+void updateProductNameDescriptor() {
+	uint8_t deviceNameLetter = eeprom_read_byte(eeprom_letter_address);
 	if ((deviceNameLetter >= 'A') && (deviceNameLetter <= 'Z')) {
-		wchar_t* name_letter_address = (wchar_t*)mrcc_name_letter_address_1;
-		*name_letter_address = '-';
-		name_letter_address = (wchar_t*)mrcc_name_letter_address_2;
+		uint16_t* name_letter_address = mrcc_name_letter_address;
+		*name_letter_address++ = '-';
 		*name_letter_address = deviceNameLetter;
 	}
 }
