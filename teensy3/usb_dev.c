@@ -180,7 +180,7 @@ static uint8_t reply_buffer[8];
 static int productNameIsUpdated = 0;
 
 void updateProductNameDescriptor() {
-	uint8_t deviceNameLetter = eeprom_read_byte(eeprom_letter_address);
+	uint8_t deviceNameLetter = eeprom_read_byte((uint8_t*)(uint32_t)eeprom_letter_address);
 	if ((deviceNameLetter >= 'A') && (deviceNameLetter <= 'Z')) {
 		uint16_t* name_letter_address = mrcc_name_letter_address;
 		*name_letter_address++ = '-';
