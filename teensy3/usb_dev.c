@@ -177,16 +177,7 @@ static void endpoint0_transmit(const void *data, uint32_t len)
 static uint8_t reply_buffer[8];
 
 #ifdef MRCC_USB_MIDI12_SERIAL
-static int productNameIsUpdated = 0;
-
-void updateProductNameDescriptor() {
-	uint8_t deviceNameLetter = eeprom_read_byte((uint8_t*)(uint32_t)eeprom_letter_address);
-	if ((deviceNameLetter >= 'A') && (deviceNameLetter <= 'Z')) {
-		uint16_t* name_letter_address = mrcc_name_letter_address;
-		*name_letter_address++ = '-';
-		*name_letter_address = deviceNameLetter;
-	}
-}
+static int deviceDescriptorsAreUpdated = 0;
 #endif
 
 static void usb_setup(void)
@@ -202,9 +193,9 @@ static void usb_setup(void)
 
 
 #ifdef MRCC_USB_MIDI12_SERIAL
-	if (!productNameIsUpdated) {
-		updateProductNameDescriptor(usb_descriptor_list);
-		productNameIsUpdated = 1;
+	if (!deviceDescriptorsAreUpdated) {
+		updateDeviceDescriptors();
+		deviceDescriptorsAreUpdated = 1;
 	}
 #endif
 

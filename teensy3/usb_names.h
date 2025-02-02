@@ -67,8 +67,7 @@ extern struct usb_string_descriptor_struct usb_string_midi_port15;
 extern struct usb_string_descriptor_struct usb_string_midi_port16;
 
 #ifdef MRCC_USB_MIDI12_SERIAL
-extern uint16_t* mrcc_name_letter_address;
-extern uint16_t eeprom_letter_address;
+void updateDeviceDescriptors();
 #endif
 
 #ifdef __cplusplus
