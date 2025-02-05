@@ -115,9 +115,9 @@ If these instructions are missing steps or could be improved, please
 let me know?  http://forum.pjrc.com/forums/4-Suggestions-amp-Bug-Reports
 */
 
-#if defined(MRCC_USB_MIDI12_SERIAL)
+#if defined(oldMRCC_USB_MIDI12_SERIAL)
   #define VENDOR_ID		    0x16C0   // via "VOTI" PJRC USB Vendor PJRC PID=1140-1239 dec
-  #define PRODUCT_ID		  0x0490 // test  MRCC 0x0490(1168), NDLR is 0x0489(1167) 	
+  #define PRODUCT_ID		  0x0490 // test  MRCC 0x0490(1168), NDLR is 0x0489(1167)
   #define BCD_DEVICE		  0x0213
   #define MANUFACTURER_NAME	{'T','e','e','n','s','y','d','u','i','n','o'}
   #define MANUFACTURER_NAME_LEN	11
@@ -151,6 +151,50 @@ let me know?  http://forum.pjrc.com/forums/4-Suggestions-amp-Bug-Reports
   #define ENDPOINT3_CONFIG	ENDPOINT_TRANSMIT_ONLY
   #define ENDPOINT4_CONFIG	ENDPOINT_TRANSMIT_ONLY
   #define ENDPOINT5_CONFIG	ENDPOINT_RECEIVE_ONLY
+
+#elif defined(MRCC_USB_MIDI12_SERIAL)
+// THIS IS A TEST TO TRY TO ENABLE AUDIO TO BE SENT TO THE MRCC FROM THE PC FOR CLOCK!
+
+  #define VENDOR_ID		    0x16C0   // via "VOTI" PJRC USB Vendor PJRC PID=1140-1239 dec
+  #define PRODUCT_ID		  0x0490 // test  MRCC 0x0490(1168), NDLR is 0x0489(1167)
+  #define BCD_DEVICE		  0x0213
+  #define MANUFACTURER_NAME	{'C','L','A','B','S'}
+  #define MANUFACTURER_NAME_LEN	5
+  #define PRODUCT_NAME		{'M','R','C','C',' ',' '}
+  #define PRODUCT_NAME_LEN	6
+  #define EP0_SIZE		64
+  #define NUM_ENDPOINTS         8
+  #define NUM_USB_BUFFERS	30
+  #define NUM_INTERFACE		6
+  #define CDC_IAD_DESCRIPTOR	1
+  #define CDC_STATUS_INTERFACE	0
+  #define CDC_DATA_INTERFACE	1	// Serial
+  #define CDC_ACM_ENDPOINT	1
+  #define CDC_RX_ENDPOINT       2
+  #define CDC_TX_ENDPOINT       3
+  #define CDC_ACM_SIZE          16
+  #define CDC_RX_SIZE           64
+  #define CDC_TX_SIZE           64
+  #define MIDI_INTERFACE        2   // MIDI
+  #define MIDI_NUM_CABLES       12  // Conductive Labs (was 16)
+  #define MIDI_TX_ENDPOINT      4
+  #define MIDI_TX_SIZE          64
+  #define MIDI_RX_ENDPOINT      5
+  #define MIDI_RX_SIZE          64
+  #define AUDIO_INTERFACE	3	// Audio (uses 3 consecutive interfaces)
+  #define AUDIO_TX_ENDPOINT     6
+  #define AUDIO_TX_SIZE         180
+  #define AUDIO_RX_ENDPOINT     7
+  #define AUDIO_RX_SIZE         180
+  #define AUDIO_SYNC_ENDPOINT	8
+  #define ENDPOINT1_CONFIG	ENDPOINT_TRANSMIT_ONLY
+  #define ENDPOINT2_CONFIG	ENDPOINT_RECEIVE_ONLY
+  #define ENDPOINT3_CONFIG	ENDPOINT_TRANSMIT_ONLY
+  #define ENDPOINT4_CONFIG	ENDPOINT_TRANSMIT_ONLY
+  #define ENDPOINT5_CONFIG	ENDPOINT_RECEIVE_ONLY
+  #define ENDPOINT6_CONFIG	ENDPOINT_TRANSMIT_ISOCHRONOUS
+  #define ENDPOINT7_CONFIG	ENDPOINT_RECEIVE_ISOCHRONOUS
+  #define ENDPOINT8_CONFIG	ENDPOINT_TRANSMIT_ISOCHRONOUS
 
 #elif defined(USB_SERIAL)
   #define VENDOR_ID		0x16C0
@@ -516,7 +560,7 @@ let me know?  http://forum.pjrc.com/forums/4-Suggestions-amp-Bug-Reports
 
 #elif defined(USB_MIDI16)
   #define VENDOR_ID		0x16C0
-  #define PRODUCT_ID		0x0540 // test  MRCC 0x0490(1168), NDLR is 0x0489(1167) 	
+  #define PRODUCT_ID		0x0540 // test  MRCC 0x0490(1168), NDLR is 0x0489(1167)
   #define BCD_DEVICE		0x0212
   #define MANUFACTURER_NAME	{'T','e','e','n','s','y','d','u','i','n','o'}
   #define MANUFACTURER_NAME_LEN	11
@@ -610,7 +654,7 @@ let me know?  http://forum.pjrc.com/forums/4-Suggestions-amp-Bug-Reports
   #define ENDPOINT5_CONFIG	ENDPOINT_RECEIVE_ONLY
 
 #elif defined(USB_MIDI16_SERIAL)
- 
+
   /* ***************************************************************************************
   //   NOTE:  files usb_desc.h  &  usb_desc.c
   //          is NOT compiled form the Git dir  C:\Github\MRCC\lib\cores\teensy3\
@@ -621,8 +665,8 @@ let me know?  http://forum.pjrc.com/forums/4-Suggestions-amp-Bug-Reports
   //          THIS IS *** BAD *** and should be changed to compile from C:\Github\MRCC\lib\cores\teensy3\
   // **************************************************************************************/
 
-  #define VENDOR_ID	  	0x16C0 // via "VOTI" PJRC USB Vendor 
-  #define PRODUCT_ID	0x047E // test  MRCC 0x0490(1150), PJRC PID=1140-1239 dec  FYI NDLR is 0x0489(1167) 	
+  #define VENDOR_ID	  	0x16C0 // via "VOTI" PJRC USB Vendor
+  #define PRODUCT_ID	0x047E // test  MRCC 0x0490(1150), PJRC PID=1140-1239 dec  FYI NDLR is 0x0489(1167)
   #define BCD_DEVICE	0x0212
   /* ***************************************************************************************
   //   NOTE:  FYI These strings are modified in file  USBNAMES.C  in C:\Github\MRCC\src\
@@ -821,7 +865,7 @@ let me know?  http://forum.pjrc.com/forums/4-Suggestions-amp-Bug-Reports
   #define CDC_ACM_SIZE          16
   #define CDC_RX_SIZE           64
   #define CDC_TX_SIZE           64
-  
+
   #define MTP_INTERFACE         2 // MTP Disk
   #define MTP_TX_ENDPOINT       4
   #define MTP_TX_SIZE           64
