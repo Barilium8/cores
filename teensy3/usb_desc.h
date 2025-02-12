@@ -46,6 +46,8 @@
 #define ENDPOINT_RECEIVE_ISOCHRONOUS	0x18
 #define ENDPOINT_TRANSMIT_ISOCHRONOUS	0x14
 
+
+
 /*
 Each group of #define lines below corresponds to one of the
 settings in the Tools > USB Type menu.  This file defines what
@@ -572,18 +574,53 @@ let me know?  http://forum.pjrc.com/forums/4-Suggestions-amp-Bug-Reports
   #define ENDPOINT4_CONFIG	ENDPOINT_TRANSMIT_ONLY
   #define ENDPOINT5_CONFIG	ENDPOINT_RECEIVE_ONLY
 
-#elif defined(USB_MIDI16_SERIAL)
- 
+#elif defined(MRCC_USB_MIDI12_SERIAL)
+  #define VENDOR_ID	  	0x16C0 // via "VOTI" PJRC USB Vendor 
+  #define PRODUCT_ID	0x0490 // MRCC 0x0490(1150), PJRC PID=1140-1239 dec  FYI NDLR is 0x0489(1167) 	
+  #define BCD_DEVICE	0x0212
   /* ***************************************************************************************
-  //   NOTE:  files usb_desc.h  &  usb_desc.c
-  //          is NOT compiled form the Git dir  C:\Github\MRCC\lib\cores\teensy3\
-  //          it IS  compiled from the PIO dir  C:\Users\steve\.platformio\packages\framework-arduinoteensy\cores\teensy3\
-  //
-  //          SO THIS FILE MUST BE MANUALLY COPIED FROM the GIT dir to the PIO dir
-  //
-  //          THIS IS *** BAD *** and should be changed to compile from C:\Github\MRCC\lib\cores\teensy3\
+  //   NOTE:  FYI These strings are modified in file  usb_descriptors.c in C:\Github\MRCC
   // **************************************************************************************/
+  #define MANUFACTURER_NAME	{'C','o','n','d','u','c','t','i','v','e',' ','L','a','b','s'}
+  #define MANUFACTURER_NAME_LEN	15
+  #define PRODUCT_NAME		{'M','R','C','C','_','?','?','?'}
+  #define PRODUCT_NAME_LEN	8
+  // ***************************************************************************************
+  #define EP0_SIZE		64
+  #define NUM_ENDPOINTS         5
+  #define NUM_USB_BUFFERS	30
+  #define NUM_INTERFACE		3
+  #define CDC_IAD_DESCRIPTOR	1
+  #define CDC_STATUS_INTERFACE	0
+  #define CDC_DATA_INTERFACE	1	// Serial
+  #define CDC_ACM_ENDPOINT	1
+  #define CDC_RX_ENDPOINT       2
+  #define CDC_TX_ENDPOINT       3
+  #define CDC_ACM_SIZE          16
+  #define CDC_RX_SIZE           64
+  #define CDC_TX_SIZE           64
+  #define MIDI_INTERFACE        2	// MIDI
+  //----------------------------------------------------------------------------
+  // Modified by Conductive Labs for MRCC product
+  // * The MRCC can only practically address 12 virtual cables, so we need to
+  //   prevent the USB library from showing us those last 4, even though they
+  //   exist.  Changing MIDI_NUM_CABLES from 16 to 12 here is a kludge, but it's
+  //   the easiest way to get the job done.
+  //----------------------------------------------------------------------------
+  #define MIDI_NUM_CABLES       12
+  //----------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
+  #define MIDI_TX_ENDPOINT      4
+  #define MIDI_TX_SIZE          64
+  #define MIDI_RX_ENDPOINT      5
+  #define MIDI_RX_SIZE          64
+  #define ENDPOINT1_CONFIG	ENDPOINT_TRANSMIT_ONLY
+  #define ENDPOINT2_CONFIG	ENDPOINT_RECEIVE_ONLY
+  #define ENDPOINT3_CONFIG	ENDPOINT_TRANSMIT_ONLY
+  #define ENDPOINT4_CONFIG	ENDPOINT_TRANSMIT_ONLY
+  #define ENDPOINT5_CONFIG	ENDPOINT_RECEIVE_ONLY
 
+#elif defined(USB_MIDI16_SERIAL)
   #define VENDOR_ID	  	0x16C0 // via "VOTI" PJRC USB Vendor 
   #define PRODUCT_ID	0x0490 // MRCC 0x0490(1150), PJRC PID=1140-1239 dec  FYI NDLR is 0x0489(1167) 	
   #define BCD_DEVICE	0x0212
