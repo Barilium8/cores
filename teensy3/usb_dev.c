@@ -176,7 +176,7 @@ static void endpoint0_transmit(const void *data, uint32_t len)
 
 static uint8_t reply_buffer[8];
 
-#ifdef MRCC_USB_MIDI12_SERIAL
+#ifdef MRCC_UPDATE_USB_DESCRIPTORS
 static int deviceDescriptorsAreUpdated = 0;
 #endif
 
@@ -192,7 +192,7 @@ static void usb_setup(void)
 	int i;
 
 
-#ifdef MRCC_USB_MIDI12_SERIAL 
+#ifdef MRCC_UPDATE_USB_DESCRIPTORS
 	if (!deviceDescriptorsAreUpdated) {
 		updateDeviceDescriptors();
 		deviceDescriptorsAreUpdated = 1;
