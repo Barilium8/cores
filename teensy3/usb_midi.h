@@ -38,7 +38,9 @@
 #include <inttypes.h>
 
 // maximum sysex length we can receive
-#if defined(__MKL26Z64__) || defined(__MK20DX128__)
+#if defined(MRCC_MIDI_SYSEX_MAX)
+#define USB_MIDI_SYSEX_MAX 64
+#elif defined(__MKL26Z64__) || defined(__MK20DX128__)
 #define USB_MIDI_SYSEX_MAX  60
 #else
 #define USB_MIDI_SYSEX_MAX 512
