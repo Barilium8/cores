@@ -576,7 +576,7 @@ let me know?  http://forum.pjrc.com/forums/4-Suggestions-amp-Bug-Reports
 
 #elif defined(MRCC_USB_MIDI12_SERIAL)
   #define VENDOR_ID	  	0x16C0 // via "VOTI" PJRC USB Vendor 
-  #define PRODUCT_ID	0x0490 // MRCC 0x0490(1150), PJRC PID=1140-1239 dec  FYI NDLR is 0x0489(1167) 	
+  #define PRODUCT_ID	0x0490 // MRCC 0x0490(1168), PJRC PID=1140-1239 dec  FYI NDLR is 0x0489(1167) 	
   #define BCD_DEVICE	0x0212
   /* ***************************************************************************************
   //   NOTE:  FYI These strings are modified in file  usb_descriptors.c in C:\Github\MRCC
@@ -622,7 +622,7 @@ let me know?  http://forum.pjrc.com/forums/4-Suggestions-amp-Bug-Reports
 
 #elif defined(USB_MIDI16_SERIAL)
   #define VENDOR_ID	  	0x16C0 // via "VOTI" PJRC USB Vendor 
-  #define PRODUCT_ID	0x0490 // MRCC 0x0490(1150), PJRC PID=1140-1239 dec  FYI NDLR is 0x0489(1167) 	
+  #define PRODUCT_ID	0x0490 // MRCC 0x0490(1168), PJRC PID=1140-1239 dec  FYI NDLR is 0x0489(1167) 	
   #define BCD_DEVICE	0x0212
   /* ***************************************************************************************
   //   NOTE:  FYI These strings are modified in file  USBNAMES.C  in C:\Github\MRCC\src\
