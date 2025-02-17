@@ -65,7 +65,7 @@
 
 // USB Device Descriptor.  The USB host reads this first, to learn
 // what type of device is connected.
-static uint8_t device_descriptor[] = {
+uint8_t device_descriptor[] = {
         18,                                     // bLength
         1,                                      // bDescriptorType
         0x10, 0x01,                             // bcdUSB
