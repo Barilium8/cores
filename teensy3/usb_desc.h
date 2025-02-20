@@ -583,8 +583,8 @@ let me know?  http://forum.pjrc.com/forums/4-Suggestions-amp-Bug-Reports
   // **************************************************************************************/
   #define MANUFACTURER_NAME	{'C','o','n','d','u','c','t','i','v','e',' ','L','a','b','s'}
   #define MANUFACTURER_NAME_LEN	15
-  #define PRODUCT_NAME		{'M','R','C','C','_','?','?','?'}
-  #define PRODUCT_NAME_LEN	8
+  #define PRODUCT_NAME		{'M','R','C','C'}
+  #define PRODUCT_NAME_LEN	4
   // ***************************************************************************************
   #define EP0_SIZE		64
   #define NUM_ENDPOINTS         5
