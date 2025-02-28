@@ -176,9 +176,6 @@ static void endpoint0_transmit(const void *data, uint32_t len)
 
 static uint8_t reply_buffer[8];
 
-#ifdef MRCC_UPDATE_USB_DESCRIPTORS
-static int deviceDescriptorsAreUpdated = 0;
-#endif
 
 static void usb_setup(void)
 {
@@ -191,13 +188,6 @@ static void usb_setup(void)
 	const uint8_t *cfg;
 	int i;
 
-
-#ifdef MRCC_UPDATE_USB_DESCRIPTORS
-	if (!deviceDescriptorsAreUpdated) {
-		updateDeviceDescriptors();
-		deviceDescriptorsAreUpdated = 1;
-	}
-#endif
 
 	switch (setup.wRequestAndType) {
 	  case 0x0500: // SET_ADDRESS
@@ -1179,7 +1169,9 @@ void usb_isr(void)
 
 }
 
-
+#ifdef MRCC_UPDATE_USB_DESCRIPTORS
+static int deviceDescriptorsAreUpdated = 0;
+#endif
 
 void usb_init(void)
 {
@@ -1189,6 +1181,13 @@ void usb_init(void)
 	//serial_print("usb_init\n");
 
 	usb_init_serialnumber();
+
+#ifdef MRCC_UPDATE_USB_DESCRIPTORS
+	if (!deviceDescriptorsAreUpdated) {
+		updateDeviceDescriptors();
+		deviceDescriptorsAreUpdated = 1;
+	}
+#endif
 
 	for (i=0; i < (NUM_ENDPOINTS+1)*4; i++) {
 		table[i].desc = 0;
