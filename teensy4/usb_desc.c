@@ -965,54 +965,54 @@ PROGMEM const uint8_t usb_config_descriptor_480[CONFIG_DESC_SIZE] = {
         1,                                      // BaSourcePin(1) = first pin
         0,                                      // iJack
   #if MIDI_NUM_CABLES >= 2
-	#define MIDI_INTERFACE_JACK_PAIR(a, b, c, d) \
-		6, 0x24, 0x02, 0x01, (a), 0, \
-		6, 0x24, 0x02, 0x02, (b), 0, \
-		9, 0x24, 0x03, 0x01, (c), 1, (b), 1, 0, \
-		9, 0x24, 0x03, 0x02, (d), 1, (a), 1, 0,
-	MIDI_INTERFACE_JACK_PAIR(5, 6, 7, 8)
+	#define MIDI_INTERFACE_JACK_PAIR(a, b, c, d, e) \
+		6, 0x24, 0x02, 0x01, (a), (e), \
+		6, 0x24, 0x02, 0x02, (b), (e), \
+		9, 0x24, 0x03, 0x01, (c), 1, (b), 1, (e), \
+		9, 0x24, 0x03, 0x02, (d), 1, (a), 1, (e),
+	MIDI_INTERFACE_JACK_PAIR(5, 6, 7, 8, 0x06)
   #endif
   #if MIDI_NUM_CABLES >= 3
-	MIDI_INTERFACE_JACK_PAIR(9, 10, 11, 12)
+	MIDI_INTERFACE_JACK_PAIR(9, 10, 11, 12, 0x07)
   #endif
   #if MIDI_NUM_CABLES >= 4
-	MIDI_INTERFACE_JACK_PAIR(13, 14, 15, 16)
+	MIDI_INTERFACE_JACK_PAIR(13, 14, 15, 16, 0x08)
   #endif
   #if MIDI_NUM_CABLES >= 5
-	MIDI_INTERFACE_JACK_PAIR(17, 18, 19, 20)
+	MIDI_INTERFACE_JACK_PAIR(17, 18, 19, 20, 0x09)
   #endif
   #if MIDI_NUM_CABLES >= 6
-	MIDI_INTERFACE_JACK_PAIR(21, 22, 23, 24)
+	MIDI_INTERFACE_JACK_PAIR(21, 22, 23, 24, 0x0A)
   #endif
   #if MIDI_NUM_CABLES >= 7
-	MIDI_INTERFACE_JACK_PAIR(25, 26, 27, 28)
+	MIDI_INTERFACE_JACK_PAIR(25, 26, 27, 28, 0x0B)
   #endif
   #if MIDI_NUM_CABLES >= 8
-	MIDI_INTERFACE_JACK_PAIR(29, 30, 31, 32)
+	MIDI_INTERFACE_JACK_PAIR(29, 30, 31, 32, 0x0C)
   #endif
   #if MIDI_NUM_CABLES >= 9
-	MIDI_INTERFACE_JACK_PAIR(33, 34, 35, 36)
+	MIDI_INTERFACE_JACK_PAIR(33, 34, 35, 36, 0x0D)
   #endif
   #if MIDI_NUM_CABLES >= 10
-	MIDI_INTERFACE_JACK_PAIR(37, 38, 39, 40)
+	MIDI_INTERFACE_JACK_PAIR(37, 38, 39, 40, 0x0E)
   #endif
   #if MIDI_NUM_CABLES >= 11
-	MIDI_INTERFACE_JACK_PAIR(41, 42, 43, 44)
+	MIDI_INTERFACE_JACK_PAIR(41, 42, 43, 44, 0x0F)
   #endif
   #if MIDI_NUM_CABLES >= 12
-	MIDI_INTERFACE_JACK_PAIR(45, 46, 47, 48)
+	MIDI_INTERFACE_JACK_PAIR(45, 46, 47, 48, 0x10)
   #endif
   #if MIDI_NUM_CABLES >= 13
-	MIDI_INTERFACE_JACK_PAIR(49, 50, 51, 52)
+	MIDI_INTERFACE_JACK_PAIR(49, 50, 51, 52, 0x11)
   #endif
   #if MIDI_NUM_CABLES >= 14
-	MIDI_INTERFACE_JACK_PAIR(53, 54, 55, 56)
+	MIDI_INTERFACE_JACK_PAIR(53, 54, 55, 56, 0x12)
   #endif
   #if MIDI_NUM_CABLES >= 15
-	MIDI_INTERFACE_JACK_PAIR(57, 58, 59, 60)
+	MIDI_INTERFACE_JACK_PAIR(57, 58, 59, 60, 0x13)
   #endif
   #if MIDI_NUM_CABLES >= 16
-	MIDI_INTERFACE_JACK_PAIR(61, 62, 63, 64)
+	MIDI_INTERFACE_JACK_PAIR(61, 62, 63, 64, 0x14)
   #endif
         // Standard Bulk OUT Endpoint Descriptor, B.5.1, Table B-11, pae 42
         9,                                      // bLength
@@ -1979,54 +1979,54 @@ PROGMEM const uint8_t usb_config_descriptor_12[CONFIG_DESC_SIZE] = {
         1,                                      // BaSourcePin(1) = first pin
         0,                                      // iJack
   #if MIDI_NUM_CABLES >= 2
-	#define MIDI_INTERFACE_JACK_PAIR(a, b, c, d) \
-		6, 0x24, 0x02, 0x01, (a), 0, \
-		6, 0x24, 0x02, 0x02, (b), 0, \
-		9, 0x24, 0x03, 0x01, (c), 1, (b), 1, 0, \
-		9, 0x24, 0x03, 0x02, (d), 1, (a), 1, 0,
-	MIDI_INTERFACE_JACK_PAIR(5, 6, 7, 8)
+	#define MIDI_INTERFACE_JACK_PAIR(a, b, c, d, e) \
+		6, 0x24, 0x02, 0x01, (a), (e), \
+		6, 0x24, 0x02, 0x02, (b), (e), \
+		9, 0x24, 0x03, 0x01, (c), 1, (b), 1, (e), \
+		9, 0x24, 0x03, 0x02, (d), 1, (a), 1, (e),
+	MIDI_INTERFACE_JACK_PAIR(5, 6, 7, 8, 0x06)
   #endif
   #if MIDI_NUM_CABLES >= 3
-	MIDI_INTERFACE_JACK_PAIR(9, 10, 11, 12)
+	MIDI_INTERFACE_JACK_PAIR(9, 10, 11, 12, 0x07)
   #endif
   #if MIDI_NUM_CABLES >= 4
-	MIDI_INTERFACE_JACK_PAIR(13, 14, 15, 16)
+	MIDI_INTERFACE_JACK_PAIR(13, 14, 15, 16, 0x08)
   #endif
   #if MIDI_NUM_CABLES >= 5
-	MIDI_INTERFACE_JACK_PAIR(17, 18, 19, 20)
+	MIDI_INTERFACE_JACK_PAIR(17, 18, 19, 20, 0x09)
   #endif
   #if MIDI_NUM_CABLES >= 6
-	MIDI_INTERFACE_JACK_PAIR(21, 22, 23, 24)
+	MIDI_INTERFACE_JACK_PAIR(21, 22, 23, 24, 0x0A)
   #endif
   #if MIDI_NUM_CABLES >= 7
-	MIDI_INTERFACE_JACK_PAIR(25, 26, 27, 28)
+	MIDI_INTERFACE_JACK_PAIR(25, 26, 27, 28, 0x0B)
   #endif
   #if MIDI_NUM_CABLES >= 8
-	MIDI_INTERFACE_JACK_PAIR(29, 30, 31, 32)
+	MIDI_INTERFACE_JACK_PAIR(29, 30, 31, 32, 0x0C)
   #endif
   #if MIDI_NUM_CABLES >= 9
-	MIDI_INTERFACE_JACK_PAIR(33, 34, 35, 36)
+	MIDI_INTERFACE_JACK_PAIR(33, 34, 35, 36, 0x0D)
   #endif
   #if MIDI_NUM_CABLES >= 10
-	MIDI_INTERFACE_JACK_PAIR(37, 38, 39, 40)
+	MIDI_INTERFACE_JACK_PAIR(37, 38, 39, 40, 0x0E)
   #endif
   #if MIDI_NUM_CABLES >= 11
-	MIDI_INTERFACE_JACK_PAIR(41, 42, 43, 44)
+	MIDI_INTERFACE_JACK_PAIR(41, 42, 43, 44, 0x0F)
   #endif
   #if MIDI_NUM_CABLES >= 12
-	MIDI_INTERFACE_JACK_PAIR(45, 46, 47, 48)
+	MIDI_INTERFACE_JACK_PAIR(45, 46, 47, 48, 0x10)
   #endif
   #if MIDI_NUM_CABLES >= 13
-	MIDI_INTERFACE_JACK_PAIR(49, 50, 51, 52)
+	MIDI_INTERFACE_JACK_PAIR(49, 50, 51, 52, 0x11)
   #endif
   #if MIDI_NUM_CABLES >= 14
-	MIDI_INTERFACE_JACK_PAIR(53, 54, 55, 56)
+	MIDI_INTERFACE_JACK_PAIR(53, 54, 55, 56, 0x12)
   #endif
   #if MIDI_NUM_CABLES >= 15
-	MIDI_INTERFACE_JACK_PAIR(57, 58, 59, 60)
+	MIDI_INTERFACE_JACK_PAIR(57, 58, 59, 60, 0x13)
   #endif
   #if MIDI_NUM_CABLES >= 16
-	MIDI_INTERFACE_JACK_PAIR(61, 62, 63, 64)
+	MIDI_INTERFACE_JACK_PAIR(61, 62, 63, 64, 0x14)
   #endif
         // Standard Bulk OUT Endpoint Descriptor, B.5.1, Table B-11, pae 42
         9,                                      // bLength
@@ -2819,6 +2819,54 @@ const usb_descriptor_list_t usb_descriptor_list[] = {
 #endif
 #ifdef MTP_INTERFACE
 	{0x0304, 0x0409, (const uint8_t *)&usb_string_mtp, 0},
+#endif
+#ifdef MIDI_INTERFACE
+	{0x0305, 0x0409, (const uint8_t *)&usb_string_midi_port1, 0},
+#if MIDI_NUM_CABLES >= 2
+	{0x0306, 0x0409, (const uint8_t *)&usb_string_midi_port2, 0},
+#endif
+#if MIDI_NUM_CABLES >= 3
+	{0x0307, 0x0409, (const uint8_t *)&usb_string_midi_port3, 0},
+#endif
+#if MIDI_NUM_CABLES >= 4
+	{0x0308, 0x0409, (const uint8_t *)&usb_string_midi_port4, 0},
+#endif
+#if MIDI_NUM_CABLES >= 5
+	{0x0309, 0x0409, (const uint8_t *)&usb_string_midi_port5, 0},
+#endif
+#if MIDI_NUM_CABLES >= 6
+	{0x030A, 0x0409, (const uint8_t *)&usb_string_midi_port6, 0},
+#endif
+#if MIDI_NUM_CABLES >= 7
+	{0x030B, 0x0409, (const uint8_t *)&usb_string_midi_port7, 0},
+#endif
+#if MIDI_NUM_CABLES >= 8
+	{0x030C, 0x0409, (const uint8_t *)&usb_string_midi_port8, 0},
+#endif
+#if MIDI_NUM_CABLES >= 9
+	{0x030D, 0x0409, (const uint8_t *)&usb_string_midi_port9, 0},
+#endif
+#if MIDI_NUM_CABLES >= 10
+	{0x030E, 0x0409, (const uint8_t *)&usb_string_midi_port10, 0},
+#endif
+#if MIDI_NUM_CABLES >= 11
+	{0x030F, 0x0409, (const uint8_t *)&usb_string_midi_port11, 0},
+#endif
+#if MIDI_NUM_CABLES >= 12
+	{0x0310, 0x0409, (const uint8_t *)&usb_string_midi_port12, 0},
+#endif
+#if MIDI_NUM_CABLES >= 13
+	{0x0311, 0x0409, (const uint8_t *)&usb_string_midi_port13, 0},
+#endif
+#if MIDI_NUM_CABLES >= 14
+	{0x0312, 0x0409, (const uint8_t *)&usb_string_midi_port14, 0},
+#endif
+#if MIDI_NUM_CABLES >= 15
+	{0x0313, 0x0409, (const uint8_t *)&usb_string_midi_port15, 0},
+#endif
+#if MIDI_NUM_CABLES >= 16
+	{0x0314, 0x0409, (const uint8_t *)&usb_string_midi_port16, 0},
+#endif
 #endif
 #ifdef EXPERIMENTAL_INTERFACE
 	{0x03EE, 0x0000, microsoft_os_string_desc, 18},

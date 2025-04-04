@@ -65,7 +65,7 @@
 
 // USB Device Descriptor.  The USB host reads this first, to learn
 // what type of device is connected.
-static uint8_t device_descriptor[] = {
+uint8_t device_descriptor[] = {
         18,                                     // bLength
         1,                                      // bDescriptorType
         0x10, 0x01,                             // bcdUSB
@@ -1844,7 +1844,7 @@ void usb_init_serialnumber(void)
 
 // This table provides access to all the descriptor data above.
 
-const usb_descriptor_list_t usb_descriptor_list[] = {
+usb_descriptor_list_t usb_descriptor_list[] = {
 	//wValue, wIndex, address,          length
 	{0x0100, 0x0000, device_descriptor, sizeof(device_descriptor)},
 	{0x0200, 0x0000, config_descriptor, sizeof(config_descriptor)},
@@ -2039,3 +2039,4 @@ const uint8_t usb_endpoint_config_table[NUM_ENDPOINTS] =
 
 #endif // NUM_ENDPOINTS
 #endif // F_CPU >= 20 MHz
+

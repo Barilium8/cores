@@ -38,12 +38,14 @@
  */
 
 #include "usb_dev.h"
+#include "usb_names.h"
 #if F_CPU >= 20000000 && defined(NUM_ENDPOINTS)
 
 #include "kinetis.h"
 //#include "HardwareSerial.h"
 #include "usb_mem.h"
 #include <string.h> // for memset
+#include <avr/eeprom.h>
 
 // This code has a known bug with compiled with -O2 optimization on gcc 5.4.1
 // https://forum.pjrc.com/threads/53574-Teensyduino-1-43-Beta-2?p=186177&viewfull=1#post186177
@@ -174,6 +176,7 @@ static void endpoint0_transmit(const void *data, uint32_t len)
 
 static uint8_t reply_buffer[8];
 
+
 static void usb_setup(void)
 {
 	const uint8_t *data = NULL;
@@ -184,6 +187,7 @@ static void usb_setup(void)
 	uint8_t epconf;
 	const uint8_t *cfg;
 	int i;
+
 
 	switch (setup.wRequestAndType) {
 	  case 0x0500: // SET_ADDRESS
@@ -1165,7 +1169,9 @@ void usb_isr(void)
 
 }
 
-
+#ifdef MRCC_UPDATE_USB_DESCRIPTORS
+static int deviceDescriptorsAreUpdated = 0;
+#endif
 
 void usb_init(void)
 {
@@ -1175,6 +1181,13 @@ void usb_init(void)
 	//serial_print("usb_init\n");
 
 	usb_init_serialnumber();
+
+#ifdef MRCC_UPDATE_USB_DESCRIPTORS
+	if (!deviceDescriptorsAreUpdated) {
+		updateDeviceDescriptors();
+		deviceDescriptorsAreUpdated = 1;
+	}
+#endif
 
 	for (i=0; i < (NUM_ENDPOINTS+1)*4; i++) {
 		table[i].desc = 0;
