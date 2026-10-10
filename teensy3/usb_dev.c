@@ -44,6 +44,9 @@
 #include "kinetis.h"
 //#include "HardwareSerial.h"
 #include "usb_mem.h"
+#if defined(MRCC_USB_MIDI12_SERIAL)
+usb_packet_t * usb_malloc_rx(void); // in usb_mem.c
+#endif
 #include <string.h> // for memset
 #include <avr/eeprom.h>
 
@@ -197,6 +200,11 @@ static void usb_setup(void)
 		usb_configuration = setup.wValue;
 		reg = &USB0_ENDPT1;
 		cfg = usb_endpoint_config_table;
+#if defined(MRCC_USB_MIDI12_SERIAL)
+		// MRCC: clear this BEFORE freeing below, or usb_free hands the freed buffers
+		// to receive banks that get overwritten further down (leaking them).
+		usb_rx_memory_needed = 0;
+#endif
 		// clear all BDT entries, free any allocated memory...
 		for (i=4; i < (NUM_ENDPOINTS+1)*4; i++) {
 			if (table[i].desc & BDT_OWN) {
@@ -1085,7 +1093,11 @@ void usb_isr(void)
 					// packets, so a flood of incoming data on 1 endpoint
 					// doesn't starve the others if the user isn't reading
 					// it regularly
+#if defined(MRCC_USB_MIDI12_SERIAL)
+					packet = usb_malloc_rx(); // MRCC: leaves the TX reserve alone (see usb_mem.c)
+#else
 					packet = usb_malloc();
+#endif
 					if (packet) {
 						b->addr = packet->buf;
 						b->desc = BDT_DESC(64,

@@ -40,17 +40,37 @@ unsigned char usb_buffer_memory[NUM_USB_BUFFERS * sizeof(usb_packet_t)];
 
 static uint32_t usb_buffer_available = 0xFFFFFFFF;
 
+#if defined(MRCC_USB_MIDI12_SERIAL)
+// MRCC: receive endpoints may not take the last USB_TX_RESERVE buffers.
+// Otherwise unread received packets (e.g. a SysEx dump from the PC routed to a
+// slow 5-pin port) fill the whole pool, usb_midi_write_packed finds no buffer,
+// and after its 40 ms timeout it drops outgoing MIDI. With the reserve, receive
+// simply stops (the host gets NAKs = flow control) and transmit keeps working.
+#define USB_TX_RESERVE 4
+static volatile uint8_t usb_buffers_free = NUM_USB_BUFFERS;
+#endif
+
 // use bitmask and CLZ instruction to implement fast free list
 // http://www.archivum.info/gnu.gcc.help/2006-08/00148/Re-GCC-Inline-Assembly.html
 // http://gcc.gnu.org/ml/gcc/2012-06/msg00015.html
 // __builtin_clz()
 
+#if defined(MRCC_USB_MIDI12_SERIAL)
+static usb_packet_t * usb_malloc_keep(unsigned int keep_free)
+#else
 usb_packet_t * usb_malloc(void)
+#endif
 {
 	unsigned int n, avail;
 	uint8_t *p;
 
 	__disable_irq();
+#if defined(MRCC_USB_MIDI12_SERIAL)
+	if (usb_buffers_free <= keep_free) {
+		__enable_irq();
+		return NULL;
+	}
+#endif
 	avail = usb_buffer_available;
 	n = __builtin_clz(avail); // clz = count leading zeros
 	if (n >= NUM_USB_BUFFERS) {
@@ -62,6 +82,9 @@ usb_packet_t * usb_malloc(void)
 	//serial_print("\n");
 
 	usb_buffer_available = avail & ~(0x80000000 >> n);
+#if defined(MRCC_USB_MIDI12_SERIAL)
+	usb_buffers_free--;
+#endif
 	__enable_irq();
 	p = usb_buffer_memory + (n * sizeof(usb_packet_t));
 	//serial_print("malloc:");
@@ -71,6 +94,19 @@ usb_packet_t * usb_malloc(void)
 	*(uint32_t *)(p + 4) = 0;
 	return (usb_packet_t *)p;
 }
+
+#if defined(MRCC_USB_MIDI12_SERIAL)
+usb_packet_t * usb_malloc(void)
+{
+	return usb_malloc_keep(0);
+}
+
+// For re-arming receive endpoints: fails while only the TX reserve is left.
+usb_packet_t * usb_malloc_rx(void)
+{
+	return usb_malloc_keep(USB_TX_RESERVE);
+}
+#endif
 
 // for the receive endpoints to request memory
 extern uint8_t usb_rx_memory_needed;
@@ -88,7 +124,13 @@ void usb_free(usb_packet_t *p)
 
 	// if any endpoints are starving for memory to receive
 	// packets, give this memory to them immediately!
+	// MRCC: ...unless that would eat into the TX reserve. Then the buffer goes back
+	// to the pool, and a later free hands one to the starving endpoint.
+#if defined(MRCC_USB_MIDI12_SERIAL)
+	if (usb_rx_memory_needed && usb_configuration && usb_buffers_free >= USB_TX_RESERVE) {
+#else
 	if (usb_rx_memory_needed && usb_configuration) {
+#endif
 		//serial_print("give to rx:");
 		//serial_phex32((int)p);
 		//serial_print("\n");
@@ -99,6 +141,9 @@ void usb_free(usb_packet_t *p)
 	mask = (0x80000000 >> n);
 	__disable_irq();
 	usb_buffer_available |= mask;
+#if defined(MRCC_USB_MIDI12_SERIAL)
+	usb_buffers_free++;
+#endif
 	__enable_irq();
 
 	//serial_print("free:");
