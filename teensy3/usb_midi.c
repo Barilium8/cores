@@ -115,6 +115,13 @@ void usb_midi_write_packed(uint32_t n)
 	uint32_t index, wait_count=0;
 
 	tx_noautoflush = 1;
+#if defined(MRCC_USB_MIDI12_SERIAL)
+	// MRCC: usb_midi_flush_output() runs in the USB start-of-frame interrupt. Without a
+	// barrier the compiler read tx_packet BEFORE setting tx_noautoflush, so a flush in that
+	// gap sent the packet, and this event was then written into a packet already gone:
+	// one USB-MIDI event (3 SysEx bytes) lost now and then.
+	__asm__ volatile("" ::: "memory");
+#endif
 	if (!tx_packet) {
         	while (1) {
                 	if (!usb_configuration) {
@@ -143,6 +150,9 @@ void usb_midi_write_packed(uint32_t n)
 		usb_tx(MIDI_TX_ENDPOINT, tx_packet);
 		tx_packet = NULL;
 	}
+#if defined(MRCC_USB_MIDI12_SERIAL)
+	__asm__ volatile("" ::: "memory"); // MRCC: packet updates land before the flush is allowed again
+#endif
 	tx_noautoflush = 0;
 }
 
