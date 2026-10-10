@@ -229,6 +229,11 @@ void usb_midi_flush_output(void)
 
 static void sysex_byte(uint8_t b)
 {
+#if defined(MRCC_USB_MIDI12_SERIAL)
+	// MRCC: a new F0 starts a new message. Drop what is left of one that never got its F7
+	// (e.g. the host aborted the send) instead of gluing it onto the front of this one.
+	if (b == 0xF0) SX_LEN = 0;
+#endif
 	if (usb_midi_handleSysExPartial && SX_LEN >= USB_MIDI_SYSEX_MAX) {
 		// when buffer is full, send another chunk to partial handler.
 		(*usb_midi_handleSysExPartial)(SX_BUF, SX_LEN, 0);
