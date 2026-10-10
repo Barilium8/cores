@@ -44,6 +44,18 @@ uint8_t usb_midi_msg_data2;
 // TODO: separate sysex buffers for each cable...
 uint8_t usb_midi_msg_sysex[USB_MIDI_SYSEX_MAX];
 uint16_t usb_midi_msg_sysex_len;
+#if defined(MRCC_USB_MIDI12_SERIAL)
+// MRCC: one SysEx buffer per cable. With the single shared buffer, SysEx arriving on two
+// cables at the same time (the PC interleaves them packet by packet) was merged into one.
+static uint8_t usb_midi_cable_sysex[MIDI_NUM_CABLES][USB_MIDI_SYSEX_MAX];
+static uint16_t usb_midi_cable_sysex_len[MIDI_NUM_CABLES];
+#define SX_CABLE (usb_midi_msg_cable < MIDI_NUM_CABLES ? usb_midi_msg_cable : 0)
+#define SX_BUF   (usb_midi_cable_sysex[SX_CABLE])
+#define SX_LEN   (usb_midi_cable_sysex_len[SX_CABLE])
+#else
+#define SX_BUF   usb_midi_msg_sysex
+#define SX_LEN   usb_midi_msg_sysex_len
+#endif
 void (*usb_midi_handleNoteOff)(uint8_t ch, uint8_t note, uint8_t vel) = NULL;
 void (*usb_midi_handleNoteOn)(uint8_t ch, uint8_t note, uint8_t vel) = NULL;
 void (*usb_midi_handleVelocityChange)(uint8_t ch, uint8_t note, uint8_t vel) = NULL;
@@ -217,13 +229,13 @@ void usb_midi_flush_output(void)
 
 static void sysex_byte(uint8_t b)
 {
-	if (usb_midi_handleSysExPartial && usb_midi_msg_sysex_len >= USB_MIDI_SYSEX_MAX) {
+	if (usb_midi_handleSysExPartial && SX_LEN >= USB_MIDI_SYSEX_MAX) {
 		// when buffer is full, send another chunk to partial handler.
-		(*usb_midi_handleSysExPartial)(usb_midi_msg_sysex, usb_midi_msg_sysex_len, 0);
-		usb_midi_msg_sysex_len = 0;
+		(*usb_midi_handleSysExPartial)(SX_BUF, SX_LEN, 0);
+		SX_LEN = 0;
 	}
-	if (usb_midi_msg_sysex_len < USB_MIDI_SYSEX_MAX) {
-		usb_midi_msg_sysex[usb_midi_msg_sysex_len++] = b;
+	if (SX_LEN < USB_MIDI_SYSEX_MAX) {
+		SX_BUF[SX_LEN++] = b;
 	}
 }
 
@@ -448,15 +460,15 @@ int usb_midi_read(uint32_t channel)
 		sysex_byte(b1);
 		if (type1 >= 0x06) sysex_byte(n >> 16);
 		if (type1 == 0x07) sysex_byte(n >> 24);
-		uint16_t len = usb_midi_msg_sysex_len;
+		uint16_t len = SX_LEN;
 		usb_midi_msg_data1 = len;
 		usb_midi_msg_data2 = len >> 8;
-		usb_midi_msg_sysex_len = 0;
+		SX_LEN = 0;
 		usb_midi_msg_type = 0xF0;			// 0xF0 = usbMIDI.SystemExclusive
 		if (usb_midi_handleSysExPartial) {
-			(*usb_midi_handleSysExPartial)(usb_midi_msg_sysex, len, 1);
+			(*usb_midi_handleSysExPartial)(SX_BUF, len, 1);
 		} else if (usb_midi_handleSysExComplete) {
-			(*usb_midi_handleSysExComplete)(usb_midi_msg_sysex, len);
+			(*usb_midi_handleSysExComplete)(SX_BUF, len);
 		}
 		return 1;
 	}
@@ -466,7 +478,7 @@ int usb_midi_read(uint32_t channel)
 			// http://little-scale.blogspot.com/2011/08/usb-midi-game-boy-sync-for-16.html
 			goto system_common_or_realtime;
 		}
-		if (b1 == 0xF0 || usb_midi_msg_sysex_len > 0) {
+		if (b1 == 0xF0 || SX_LEN > 0) {
 			// From David Sorlien, dsorlien at gmail.com, http://axe4live.wordpress.com
 			// OSX sometimes uses Single Byte Unparsed to
 			// send bytes in the middle of a SYSEX message.
