@@ -216,6 +216,25 @@ void usb_midi_send_sysex_add_term_bytes(const uint8_t *data, uint32_t length, ui
 
 void usb_midi_flush_output(void)
 {
+#if defined(MRCC_USB_MIDI12_SERIAL)
+	// MRCC: this runs in the USB start-of-frame interrupt, and the MRCC clock interrupt
+	// (higher priority) writes MIDI clock with usb_midi_write_packed(). A clock tick that
+	// landed between usb_tx() and tx_packet = NULL wrote into the packet already queued,
+	// and when that filled it, queued it AGAIN: the PC got the same packet twice (about
+	// 15 msgs repeated) and the packet was freed twice. So the packet is taken off
+	// tx_packet with interrupts off, and sent after.
+	usb_packet_t *p = NULL;
+	uint32_t primask;
+	__asm__ volatile("mrs %0, primask\n" : "=r" (primask) :: "memory");
+	__disable_irq();
+	if (tx_noautoflush == 0 && tx_packet && tx_packet->index > 0) {
+		p = tx_packet;
+		p->len = p->index * 4;
+		tx_packet = NULL;
+	}
+	if (!primask) __enable_irq();
+	if (p) usb_tx(MIDI_TX_ENDPOINT, p);
+#else
 	if (tx_noautoflush == 0) {
 		tx_noautoflush = 1;
 		if (tx_packet && tx_packet->index > 0) {
@@ -225,6 +244,7 @@ void usb_midi_flush_output(void)
 		}
 		tx_noautoflush = 0;
 	}
+#endif
 }
 
 static void sysex_byte(uint8_t b)
