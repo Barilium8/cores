@@ -143,7 +143,13 @@ void usb_serial_flush_input(void)
 }
 
 // Maximum number of transmit packets to queue so we don't starve other endpoints for memory
+#if defined(MRCC_USB_MIDI12_SERIAL)
+// MRCC: the serial port is debug-only. With no terminal open, 8 queued packets plus
+// the BDTs could pin enough buffers to eat the MIDI TX reserve (see usb_mem.c).
+#define TX_PACKET_LIMIT 2
+#else
 #define TX_PACKET_LIMIT 8
+#endif
 
 // When the PC isn't listening, how long do we wait before discarding data?  If this is
 // too short, we risk losing data during the stalls that are common with ordinary desktop

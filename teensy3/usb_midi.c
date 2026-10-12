@@ -44,6 +44,18 @@ uint8_t usb_midi_msg_data2;
 // TODO: separate sysex buffers for each cable...
 uint8_t usb_midi_msg_sysex[USB_MIDI_SYSEX_MAX];
 uint16_t usb_midi_msg_sysex_len;
+#if defined(MRCC_USB_MIDI12_SERIAL)
+// MRCC: one SysEx buffer per cable. With the single shared buffer, SysEx arriving on two
+// cables at the same time (the PC interleaves them packet by packet) was merged into one.
+static uint8_t usb_midi_cable_sysex[MIDI_NUM_CABLES][USB_MIDI_SYSEX_MAX];
+static uint16_t usb_midi_cable_sysex_len[MIDI_NUM_CABLES];
+#define SX_CABLE (usb_midi_msg_cable < MIDI_NUM_CABLES ? usb_midi_msg_cable : 0)
+#define SX_BUF   (usb_midi_cable_sysex[SX_CABLE])
+#define SX_LEN   (usb_midi_cable_sysex_len[SX_CABLE])
+#else
+#define SX_BUF   usb_midi_msg_sysex
+#define SX_LEN   usb_midi_msg_sysex_len
+#endif
 void (*usb_midi_handleNoteOff)(uint8_t ch, uint8_t note, uint8_t vel) = NULL;
 void (*usb_midi_handleNoteOn)(uint8_t ch, uint8_t note, uint8_t vel) = NULL;
 void (*usb_midi_handleVelocityChange)(uint8_t ch, uint8_t note, uint8_t vel) = NULL;
@@ -115,6 +127,13 @@ void usb_midi_write_packed(uint32_t n)
 	uint32_t index, wait_count=0;
 
 	tx_noautoflush = 1;
+#if defined(MRCC_USB_MIDI12_SERIAL)
+	// MRCC: usb_midi_flush_output() runs in the USB start-of-frame interrupt. Without a
+	// barrier the compiler read tx_packet BEFORE setting tx_noautoflush, so a flush in that
+	// gap sent the packet, and this event was then written into a packet already gone:
+	// one USB-MIDI event (3 SysEx bytes) lost now and then.
+	__asm__ volatile("" ::: "memory");
+#endif
 	if (!tx_packet) {
         	while (1) {
                 	if (!usb_configuration) {
@@ -143,6 +162,9 @@ void usb_midi_write_packed(uint32_t n)
 		usb_tx(MIDI_TX_ENDPOINT, tx_packet);
 		tx_packet = NULL;
 	}
+#if defined(MRCC_USB_MIDI12_SERIAL)
+	__asm__ volatile("" ::: "memory"); // MRCC: packet updates land before the flush is allowed again
+#endif
 	tx_noautoflush = 0;
 }
 
@@ -194,6 +216,25 @@ void usb_midi_send_sysex_add_term_bytes(const uint8_t *data, uint32_t length, ui
 
 void usb_midi_flush_output(void)
 {
+#if defined(MRCC_USB_MIDI12_SERIAL)
+	// MRCC: this runs in the USB start-of-frame interrupt, and the MRCC clock interrupt
+	// (higher priority) writes MIDI clock with usb_midi_write_packed(). A clock tick that
+	// landed between usb_tx() and tx_packet = NULL wrote into the packet already queued,
+	// and when that filled it, queued it AGAIN: the PC got the same packet twice (about
+	// 15 msgs repeated) and the packet was freed twice. So the packet is taken off
+	// tx_packet with interrupts off, and sent after.
+	usb_packet_t *p = NULL;
+	uint32_t primask;
+	__asm__ volatile("mrs %0, primask\n" : "=r" (primask) :: "memory");
+	__disable_irq();
+	if (tx_noautoflush == 0 && tx_packet && tx_packet->index > 0) {
+		p = tx_packet;
+		p->len = p->index * 4;
+		tx_packet = NULL;
+	}
+	if (!primask) __enable_irq();
+	if (p) usb_tx(MIDI_TX_ENDPOINT, p);
+#else
 	if (tx_noautoflush == 0) {
 		tx_noautoflush = 1;
 		if (tx_packet && tx_packet->index > 0) {
@@ -203,17 +244,23 @@ void usb_midi_flush_output(void)
 		}
 		tx_noautoflush = 0;
 	}
+#endif
 }
 
 static void sysex_byte(uint8_t b)
 {
-	if (usb_midi_handleSysExPartial && usb_midi_msg_sysex_len >= USB_MIDI_SYSEX_MAX) {
+#if defined(MRCC_USB_MIDI12_SERIAL)
+	// MRCC: a new F0 starts a new message. Drop what is left of one that never got its F7
+	// (e.g. the host aborted the send) instead of gluing it onto the front of this one.
+	if (b == 0xF0) SX_LEN = 0;
+#endif
+	if (usb_midi_handleSysExPartial && SX_LEN >= USB_MIDI_SYSEX_MAX) {
 		// when buffer is full, send another chunk to partial handler.
-		(*usb_midi_handleSysExPartial)(usb_midi_msg_sysex, usb_midi_msg_sysex_len, 0);
-		usb_midi_msg_sysex_len = 0;
+		(*usb_midi_handleSysExPartial)(SX_BUF, SX_LEN, 0);
+		SX_LEN = 0;
 	}
-	if (usb_midi_msg_sysex_len < USB_MIDI_SYSEX_MAX) {
-		usb_midi_msg_sysex[usb_midi_msg_sysex_len++] = b;
+	if (SX_LEN < USB_MIDI_SYSEX_MAX) {
+		SX_BUF[SX_LEN++] = b;
 	}
 }
 
@@ -438,15 +485,15 @@ int usb_midi_read(uint32_t channel)
 		sysex_byte(b1);
 		if (type1 >= 0x06) sysex_byte(n >> 16);
 		if (type1 == 0x07) sysex_byte(n >> 24);
-		uint16_t len = usb_midi_msg_sysex_len;
+		uint16_t len = SX_LEN;
 		usb_midi_msg_data1 = len;
 		usb_midi_msg_data2 = len >> 8;
-		usb_midi_msg_sysex_len = 0;
+		SX_LEN = 0;
 		usb_midi_msg_type = 0xF0;			// 0xF0 = usbMIDI.SystemExclusive
 		if (usb_midi_handleSysExPartial) {
-			(*usb_midi_handleSysExPartial)(usb_midi_msg_sysex, len, 1);
+			(*usb_midi_handleSysExPartial)(SX_BUF, len, 1);
 		} else if (usb_midi_handleSysExComplete) {
-			(*usb_midi_handleSysExComplete)(usb_midi_msg_sysex, len);
+			(*usb_midi_handleSysExComplete)(SX_BUF, len);
 		}
 		return 1;
 	}
@@ -456,7 +503,7 @@ int usb_midi_read(uint32_t channel)
 			// http://little-scale.blogspot.com/2011/08/usb-midi-game-boy-sync-for-16.html
 			goto system_common_or_realtime;
 		}
-		if (b1 == 0xF0 || usb_midi_msg_sysex_len > 0) {
+		if (b1 == 0xF0 || SX_LEN > 0) {
 			// From David Sorlien, dsorlien at gmail.com, http://axe4live.wordpress.com
 			// OSX sometimes uses Single Byte Unparsed to
 			// send bytes in the middle of a SYSEX message.
